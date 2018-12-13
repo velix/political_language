@@ -4,11 +4,15 @@ from sklearn.preprocessing import label_binarize
 import numpy as np
 import os
 import spacy
+from bert_serving.client import BertClient
 
-TRAINING_DATA_DIR = "data/convote_v1.1/data_stage_one/training_set"
 
-nlp = spacy.load('en_vectors_web_lg')
-nlp.add_pipe(nlp.create_pipe('sentencizer'))
+
+TRAINING_DATA_DIR = "../data/convote_v1.1/data_stage_one/training_set"
+
+bc = BertClient()
+# nlp = spacy.load('en_vectors_web_lg')
+# nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
 vectors = []
 labels = []
@@ -24,9 +28,9 @@ for idx, speech_file in enumerate(os.listdir(TRAINING_DATA_DIR)):
     with open(os.path.join(TRAINING_DATA_DIR, speech_file), "r") as f:
         speech = f.readlines()
 
-    speech_doc = nlp("".join(speech))
-    sentences = speech_doc.sents
-    vector = np.mean([sent.vector for sent in sentences], axis=0)
+    speech_doc = "".join(speech)
+    sentences = [sent.strip() for sent in speech_doc.split(".") if len(sent.strip()) > 0]
+    vector = np.mean(bc.encode(sentences), axis=0)
 
     vectors.append(vector)
     labels.append(party)
