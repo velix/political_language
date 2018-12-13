@@ -1,14 +1,15 @@
-from keras.models import Sequential
-from keras.layers import GRU, Bidirectional, Dense
+from keras.models import Model
+from keras.layers import Input, GRU, Bidirectional, Dense
 
 import DataLoader
 
 dl = DataLoader.DataLoader()
 
-model = Sequential()
+input = Input(batch_shape=(None, 384))
+gru = GRU(units=100)(input)
+dense = Dense(1, activation="softmax")(gru)
 
-model.add(Bidirectional(GRU(units=50), input_shape=(None, 768)))
-model.add(Dense(1, activation="softmax"))
+model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
 
 for epoch in range(20):
