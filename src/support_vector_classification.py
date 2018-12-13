@@ -1,10 +1,10 @@
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import numpy as np
+from DataLoader import DataLoader
 
 
-
-
+loader = DataLoader()
 
 svc = SVC(gamma="scale").fit(vectors, labels)
 
