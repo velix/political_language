@@ -20,25 +20,26 @@ class DataLoader:
         self.labels = []
 
     def generate_vectors(self, data_directory):
-        for idx, speech_file in enumerate(os.listdir(data_directory)):
-            # ###_@@@@@@_%%%%$$$_PMV
-            segments = speech_file.split("_")
-            party = segments[-1][0]
+	while True:
+        	for idx, speech_file in enumerate(os.listdir(data_directory)):
+            	# ###_@@@@@@_%%%%$$$_PMV
+            	segments = speech_file.split("_")
+            	party = segments[-1][0]
 
-            if party == "X":
-                continue
-            label = self._party_to_label(party)
+            	if party == "X":
+                	continue
+            	label = self._party_to_label(party)
 
-            with open(os.path.join(data_directory, speech_file), "r") as f:
-                speech = f.readlines()
+            	with open(os.path.join(data_directory, speech_file), "r") as f:
+                	speech = f.readlines()
 
-            sentences = self._get_sentences(speech)
-            doc_vectors = self.bc.encode(sentences)
-            doc_labels = np.ones(np.shape(doc_vectors)[0])*label
+            	sentences = self._get_sentences(speech)
+            	doc_vectors = self.bc.encode(sentences)
+            	doc_labels = np.ones(np.shape(doc_vectors)[0])*label
 
-            yield(doc_vectors, doc_labels)
+        	    yield(doc_vectors, doc_labels)
 
-        # labels = label_binarize(labels, np.unique(np.array(labels, dtype=str)))
+      	  # labels = label_binarize(labels, np.unique(np.array(labels, dtype=str)))
 
     def _party_to_label(self, party):
         if party == "D":
