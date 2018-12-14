@@ -9,7 +9,7 @@ dl = DataLoader.DataLoader()
 X = []
 y = []
 
-for X, y in dl.generate_X(DataLoader.TRAINING_DATA_DIR):
+for X, y in dl.generate_vectors(DataLoader.TRAINING_DATA_DIR):
     X.extend(X)
     y.extend(y)
 
@@ -30,7 +30,7 @@ print("SVC Training accuracy: ", accuracy)
 X_dev = []
 y_dev = []
 
-for X_dev, y_dev in dl.generate_X(DataLoader.DEV_DATA_DIR):
+for X_dev, y_dev in dl.generate_vectors(DataLoader.DEV_DATA_DIR):
     X_dev.extend(X_dev)
     y_dev.extend(y_dev)
 
