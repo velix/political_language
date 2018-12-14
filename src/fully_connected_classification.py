@@ -1,16 +1,19 @@
 from keras.models import Model
 from keras.layers import Input, Dense
+from keras.utils import print_summary
 
 import DataLoader
 
 dl = DataLoader.DataLoader()
 
-input = Input(shape=(None, 768))
+input = Input(shape=(768,))
 dense1 = Dense(256, activation="relu")(input)
 dense2 = Dense(1, activation="softmax")(dense1)
 
 model = Model(inputs=input, outputs=dense2)
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+
+print_summary(model)
 
 for epoch in range(20):
     for (X, y) in dl.generate_vectors(DataLoader.TRAINING_DATA_DIR):
