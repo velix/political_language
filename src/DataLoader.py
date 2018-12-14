@@ -12,14 +12,13 @@ TEST_DATA_DIR = "../data/convote_v1.1/data_stage_one/test_set"
 
 
 class DataLoader(Sequence):
-    def __init__(self, data_directory):
+    def __init__(self, data_directory, time_distributed=False):
         self.bc = BertClient()
         self.data_directory = data_directory
         # nlp = spacy.load('en_vectors_web_lg')
         # nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
-        self.vectors = []
-        self.labels = []
+        self.time_distributed = time_distributed
 
     def __len__(self):
         return len(os.listdir(self.data_directory))
@@ -41,6 +40,10 @@ class DataLoader(Sequence):
         sentences = self._get_sentences(speech)
         doc_vectors = self.bc.encode(sentences)
         doc_labels = np.ones((np.shape(doc_vectors)[0],))*label
+
+        if self.time_distributed:
+            rows, columns = np.shape(doc_vectors)
+            return (np.reshape(doc_vectors, (1, rows, columns)), doc_labels)
 
         return (doc_vectors, doc_labels)
 

@@ -79,5 +79,5 @@ for speech_file in os.listdir(test_dl.data_directory):
     y_dev.append(label)
     model_pred.append(predicted_label)
 
-accuracy = accuracy_score(y_dev, predictions)
+accuracy = accuracy_score(y_dev, model_pred)
 print("Test accuracy: ", accuracy)
