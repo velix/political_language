@@ -5,7 +5,7 @@ import DataLoader
 
 dl = DataLoader.DataLoader()
 
-input = Input(batch_shape=(None, 384))
+input = Input(shape=(, 384))
 gru = GRU(units=100)(input)
 dense = Dense(1, activation="softmax")(gru)
 
