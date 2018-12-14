@@ -3,6 +3,7 @@ import os
 import numpy as np
 from bert_serving.client import BertClient
 from keras.preprocessing.text import text_to_word_sequence
+from keras.utils import Sequence
 
 
 TRAINING_DATA_DIR = "../data/convote_v1.1/data_stage_one/training_set"
@@ -10,26 +11,30 @@ DEV_DATA_DIR = "../data/convote_v1.1/data_stage_one/development_set"
 TEST_DATA_DIR = "../data/convote_v1.1/data_stage_one/test_set"
 
 
-class DataLoader:
-    def __init__(self):
+class DataLoader(Sequence):
+    def __init__(self, data_directory):
         self.bc = BertClient()
+        self.data_directory = data_directory
         # nlp = spacy.load('en_vectors_web_lg')
         # nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
         self.vectors = []
         self.labels = []
 
-    def generate_vectors(self, data_directory):
-        for idx, speech_file in enumerate(os.listdir(data_directory)):
+    def __len__(self):
+        return len(os.listdir(self.data_directory))
+
+    def generate_vectors(self):
+        for idx, speech_file in enumerate(os.listdir(self.data_directory)):
             # ###_@@@@@@_%%%%$$$_PMV
             segments = speech_file.split("_")
             party = segments[-1][0]
 
-            if party == "X":
-                continue
             label = self._party_to_label(party)
+            if label is None:
+                continue
 
-            with open(os.path.join(data_directory, speech_file), "r") as f:
+            with open(os.path.join(self.data_directory, speech_file), "r") as f:
                 speech = f.readlines()
 
             sentences = self._get_sentences(speech)
@@ -45,7 +50,7 @@ class DataLoader:
             return 1
         elif party == "R":
             return 0
-
+        return None
 
     def _get_sentences(self, speech_lines):
         speech_doc = "".join(speech_lines)
