@@ -6,7 +6,7 @@ import DataLoader
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR)
 
-input = Input(shape=(None, 768))
+input = Input(shape=(768, ))
 dense1 = Dense(256, activation="relu")(input)
 dense2 = Dense(1, activation="softmax")(dense1)
 
