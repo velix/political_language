@@ -34,7 +34,7 @@ class DataLoader:
 
             sentences = self._get_sentences(speech)
             doc_vectors = self.bc.encode(sentences)
-            doc_labels = np.ones(np.shape(doc_vectors)[0])*label
+            doc_labels = np.ones((np.shape(doc_vectors)[0],))*label
 
             yield(doc_vectors, doc_labels)
 
