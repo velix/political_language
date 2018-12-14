@@ -21,7 +21,7 @@ model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/fully_connected.png", show_shapes=True)
 
-history = model.fit_generator(train_dl, epochs=4, validation_data=dev_dl)
+history = model.fit_generator(train_dl, epochs=10, validation_data=dev_dl)
 
 
 # for epoch in range(1):
@@ -44,7 +44,8 @@ plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.savefig("../models/fully_connected_accuracy.png")
-
+plt.close()
+plt.clf()
 # summarize history for loss
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
