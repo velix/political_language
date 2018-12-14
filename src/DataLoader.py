@@ -24,26 +24,26 @@ class DataLoader(Sequence):
     def __len__(self):
         return len(os.listdir(self.data_directory))
 
-    def generate_vectors(self):
-        for idx, speech_file in enumerate(os.listdir(self.data_directory)):
-            # ###_@@@@@@_%%%%$$$_PMV
-            segments = speech_file.split("_")
-            party = segments[-1][0]
+    def __getitem__(self, idx):
+        speeches = os.listdir(self.data_directory)
+        speech_file = speeches[idx]
+        # ###_@@@@@@_%%%%$$$_PMV
+        segments = speech_file.split("_")
+        party = segments[-1][0]
 
-            label = self._party_to_label(party)
-            if label is None:
-                continue
+        label = self._party_to_label(party)
+        if label is None:
+            return None
 
-            with open(os.path.join(self.data_directory, speech_file), "r") as f:
-                speech = f.readlines()
+        with open(os.path.join(self.data_directory, speech_file), "r") as f:
+            speech = f.readlines()
 
-            sentences = self._get_sentences(speech)
-            doc_vectors = self.bc.encode(sentences)
-            doc_labels = np.ones((np.shape(doc_vectors)[0],))*label
+        sentences = self._get_sentences(speech)
+        doc_vectors = self.bc.encode(sentences)
+        doc_labels = np.ones((np.shape(doc_vectors)[0],))*label
 
-            yield(doc_vectors, doc_labels)
+        return (doc_vectors, doc_labels)
 
-            # labels = label_binarize(labels, np.unique(np.array(labels, dtype=str)))
 
     def _party_to_label(self, party):
         if party == "D":
