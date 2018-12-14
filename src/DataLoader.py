@@ -64,14 +64,15 @@ class DataLoader:
     def _clean_up_names(self, sentence):
         open_par = sentence.find("(")
         if open_par != -1:
+            sentence = sentence.replace(sentence[open_par], '')
+            
             close_par = sentence.find(")")
+            sentence = sentence.replace(sentence[close_par], '')
 
             ref_number_start = sentence.find("xz")
             ref_number = sentence[ref_number_start:ref_number_start+9]
 
             sentence = sentence.replace(ref_number, '')
-            sentence = sentence.replace(sentence[open_par], '')
-            sentence = sentence.replace(sentence[close_par], '')
 
         return sentence
 
