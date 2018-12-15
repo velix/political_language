@@ -7,14 +7,15 @@ train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR, True)
 
-input = Input(shape=(768, ))
-# gru = GRU(units=100, return_sequences=True, stateful=True)(input)
-encoded = TimeDistributed(Bidirectional(GRU(units=50, return_sequences=True, stateful=True)))(input)
+input = Input(shape=(1, 768 ))
+# gru = GRU(units=100, return_sequences=True)(input)
+bidirectional_gru =  Bidirectional(GRU(units=50, return_sequences=True))
+encoded = TimeDistributed(bidirectional_gru)(input)
 
-dense = Dense(1, activation="softmax")(encoded)
+dense = Dense(3, activation="softmax")(encoded)
 
 model = Model(inputs=input, outputs=dense)
-model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["binary_accuracy", "categorical_accuracy"])
+model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
 
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)

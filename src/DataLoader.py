@@ -53,7 +53,8 @@ class DataLoader(Sequence):
             return 1
         elif party == "R":
             return 0
-        return None
+        else:
+            return -1
 
     def _get_sentences(self, speech_lines):
         speech_doc = "".join(speech_lines)
