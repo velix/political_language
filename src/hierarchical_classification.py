@@ -7,10 +7,10 @@ train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR, True)
 
-input = Input(shape=(768, 1))
-# gru = GRU(units=100, return_sequences=True)(input)
-bidirectional_gru = Bidirectional(GRU(units=50, return_sequences=True))
-encoded = TimeDistributed(bidirectional_gru)(input)
+input = Input(shape=(768,))
+encoded = GRU(units=100, return_sequences=True)(input)
+# bidirectional_gru = Bidirectional(GRU(units=50, return_sequences=True))
+# encoded = TimeDistributed(gru)(input)
 
 dense = Dense(3, activation="softmax")(encoded)
 
