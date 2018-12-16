@@ -35,7 +35,7 @@ model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categ
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)
 
-history = model.fit_generator(train_dl.generate(), epochs=8,
+history = model.fit_generator(train_dl.generate(), epochs=10,
                               validation_data=dev_dl.generate(),
                               validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                               steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
