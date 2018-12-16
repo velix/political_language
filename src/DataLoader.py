@@ -36,11 +36,13 @@ class DataLoader(Sequence):
         vectors = []
         labels = []
 
-        for speech_file in speeches[self.document_index:self.document_index+self.batch_size]:
-            if self.document_index + self.batch_size >= len(speeches):
+        sample_counter = 0
+        while sample_counter < self.batch_size:
+            speech_file = speeches[self.document_index]
+            if self.document_index >= len(speeches)-1:
                 self.document_index = 0
             else:
-                self.document_index += self.batch_size
+                self.document_index += 1
 
             label = self._get_label(speech_file)
 
@@ -54,10 +56,11 @@ class DataLoader(Sequence):
 
             vectors.append(doc_vectors)
             labels.append(one_hot_label)
+            sample_counter += 1
         
         # print("Vectors: ", np.shape(vectors))
         # print("Labels: ", np.shape(labels))
-
+            
         return (np.asarray(vectors), np.asarray(labels))
 
         # if self.time_distributed:

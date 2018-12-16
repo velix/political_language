@@ -3,6 +3,7 @@ from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
+import numpy as np
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
@@ -31,11 +32,11 @@ model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categ
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)
 
-history = model.fit_generator(train_dl, epochs=1, validation_data=dev_dl)
+history = model.fit_generator(train_dl, epochs=1, validation_data=dev_dl, steps_per_epoch=int(np.floor(5660/32)))
 
-score = model.evaluate_generator(test_dl)
+score = model.evaluate_generator(test_dl, epoch=int(np.floor(5660/32)))
 
-predictions = model.predict_generator(test_dl)
+predictions = model.predict_generator(test_dl, epoch=int(np.floor(5660/32)))
 
 print("Final model score: ", score)
 
