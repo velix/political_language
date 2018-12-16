@@ -1,7 +1,8 @@
 from keras.models import Model
 from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
-from keras import utils 
+from keras import utils
 import DataLoader
+import matplotlib.pyplot as plt
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
@@ -32,8 +33,27 @@ utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=T
 
 history = model.fit_generator(train_dl, epochs=4, validation_data=dev_dl)
 
-score = model.evaluate_generator(dl.generate_vectors(DataLoader.DEV_DATA_DIR))
+score = model.evaluate_generator(test_dl)
 
-predictions = model.predict_generator(dl.generate_vectors(DataLoader.DEV_DATA_DIR))
+predictions = model.predict_generator(test_dl)
 
 print("Final model score: ", score)
+
+# summarize history for accuracy
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("../models/fully_connected_accuracy.png")
+plt.close()
+plt.clf()
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("../models/fully_connected_loss.png")
