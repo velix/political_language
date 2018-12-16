@@ -36,24 +36,27 @@ class DataLoader(Sequence):
         vectors = []
         labels = []
 
-        for speech_file in speeches[self.document_index:self.document_index+self.batch_size]:
-            if self.document_index + self.batch_size >= len(speeches):
+        sample_counter = 0
+        while sample_counter < self.batch_size:
+            speech_file = speeches[self.document_index]
+            if self.document_index >= len(speeches):
                 self.document_index = 0
             else:
-                self.document_index += self.batch_size
+                self.document_index += 1
 
             label = self._get_label(speech_file)
 
             doc_vectors = self._get_sentences_as_vectors(speech_file)
             # check for documents with fewer sentences than MIN_DOC_LENGTH
             if doc_vectors is None:
-                return None
+                continue
 
             one_hot_label = to_categorical(label, 3)
             # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
 
             vectors.append(doc_vectors)
             labels.append(one_hot_label)
+            sample_counter += 1
 
         return (vectors, labels)
 
