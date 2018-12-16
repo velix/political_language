@@ -1,5 +1,5 @@
 from keras.models import Model
-from keras.layers import Input, GRU, Bidirectional, Dense, Dropout
+from keras.layers import Input, GRU, Bidirectional, Dense, Dropout, TimeDistributed
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
@@ -25,9 +25,9 @@ the last node in the rnn
 '''
 
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
-bidirectional_gru = Bidirectional(GRU(units=190))(input)
-dropout = Dropout(0.3)(bidirectional_gru)
-dense = Dense(3, activation="softmax")(dropout)
+bidirectional_gru = Bidirectional(GRU(units=190, return_sequences=True))(input)
+# dropout = Dropout(0.3)(bidirectional_gru)
+dense = TimeDistributed(Dense(3, activation="softmax"))(bidirectional_gru)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
