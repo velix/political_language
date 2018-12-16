@@ -5,6 +5,7 @@ import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import Attention
 
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
@@ -27,7 +28,9 @@ the last node in the rnn
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
 bidirectional_gru = Bidirectional(GRU(units=190, return_sequences=True))(input)
 # dropout = Dropout(0.3)(bidirectional_gru)
-dense = TimeDistributed(Dense(3, activation="softmax"))(bidirectional_gru)
+encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
+attention = Attention()(encoder_weights)
+dense = Dense(3, activation="softmax")(attention)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
