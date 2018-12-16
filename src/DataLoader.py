@@ -47,15 +47,18 @@ class DataLoader(Sequence):
             doc_vectors = self._get_sentences_as_vectors(speech_file)
             # check for documents with fewer sentences than MIN_DOC_LENGTH
             if doc_vectors is None:
-                return None
-
+                continue
+            
             one_hot_label = to_categorical(label, 3)
             # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
 
             vectors.append(doc_vectors)
             labels.append(one_hot_label)
+        
+        # print("Vectors: ", np.shape(vectors))
+        # print("Labels: ", np.shape(labels))
 
-        return (vectors, labels)
+        return (np.asarray(vectors), np.asarray(labels))
 
         # if self.time_distributed:
         #     rows, columns = np.shape(doc_vectors)
