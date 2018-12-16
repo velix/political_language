@@ -15,7 +15,8 @@ MIN_DOC_LENGTH = 4
 
 SENT_FEATURES = 768
 
-class DataLoader(Sequence):
+
+class DataLoader:
     def __init__(self, data_directory, time_distributed=False):
         self.bc = BertClient()
         self.data_directory = data_directory

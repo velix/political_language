@@ -9,7 +9,7 @@ train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR, True)
 
-print("Trai samples: ", train_dl.samples)
+print("Train samples: ", train_dl.samples)
 print("Dev samples: ", dev_dl.samples)
 print("Test samples: ", test_dl.samples)
 
