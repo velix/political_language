@@ -43,41 +43,33 @@ class DataLoader(Sequence):
     def generate(self):
         speeches = os.listdir(self.data_directory)
 
-        vectors = []
-        labels = []
+        while True:
+            vectors = []
+            labels = []
 
-        sample_counter = 0
-        while sample_counter < self.batch_size:
-            speech_file = speeches[self.document_index]
-            if self.document_index >= len(speeches)-1:
-                self.document_index = 0
-            else:
-                self.document_index += 1
+            sample_counter = 0
+            while sample_counter < self.batch_size:
+                speech_file = speeches[self.document_index]
+                if self.document_index >= len(speeches)-1:
+                    self.document_index = 0
+                else:
+                    self.document_index += 1
 
-            label = self._get_label(speech_file)
+                label = self._get_label(speech_file)
 
-            doc_vectors = self._get_sentences_as_vectors(speech_file)
-            # check for documents with fewer sentences than MIN_DOC_LENGTH
-            if doc_vectors is None:
-                continue
+                doc_vectors = self._get_sentences_as_vectors(speech_file)
+                # check for documents with fewer sentences than MIN_DOC_LENGTH
+                if doc_vectors is None:
+                    continue
 
-            one_hot_label = to_categorical(label, 3)
-            # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
+                one_hot_label = to_categorical(label, 3)
+                # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
 
-            vectors.append(doc_vectors)
-            labels.append(one_hot_label)
-            sample_counter += 1
+                vectors.append(doc_vectors)
+                labels.append(one_hot_label)
+                sample_counter += 1
 
-        yield (vectors, labels)
-
-        # if self.time_distributed:
-        #     rows, columns = np.shape(doc_vectors)
-        #     vectors_reshape = np.reshape(doc_vectors, (1, rows, columns))
-        #     #labels_reshape = np.reshape(doc_labels, ((1,) + np.shape(doc_labels)))
-        #     labels_reshape = np.reshape(one_hot_label, (1,  len(one_hot_label)))
-        #     return (vectors_reshape, labels_reshape)
-
-        # return (doc_vectors, doc_labels)
+            yield (np.asarray(vectors), np.asarray(labels))
 
     def _get_label(self, speech_file):
         segments = speech_file.split("_")
