@@ -27,10 +27,20 @@ class DataLoader(Sequence):
         self.document_index = 0
         self.batch_size = 32
 
+        self.samples = 0
+        for speech_file in os.listdir(self.data_directory):
+            with open(os.path.join(self.data_directory, speech_file), "r") as f:
+                speech = f.readlines()
+
+            sentences = self._get_sentences(speech)
+
+            if len(sentences) > MIN_DOC_LENGTH:
+                self.samples += 1
+
     def __len__(self):
         return len(os.listdir(self.data_directory))
 
-    def __getitem__(self, idx):
+    def generate(self):
         speeches = os.listdir(self.data_directory)
 
         vectors = []
@@ -58,7 +68,7 @@ class DataLoader(Sequence):
             labels.append(one_hot_label)
             sample_counter += 1
 
-        return (vectors, labels)
+        yield (vectors, labels)
 
         # if self.time_distributed:
         #     rows, columns = np.shape(doc_vectors)
