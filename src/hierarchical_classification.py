@@ -1,5 +1,5 @@
 from keras.models import Model
-from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
+from keras.layers import Input, GRU, Bidirectional, Dense, Dropout
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
@@ -25,11 +25,9 @@ the last node in the rnn
 '''
 
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
-# encoded = GRU(units=100)(input)
-bidirectional_gru = Bidirectional(GRU(units=50))(input)
-# encoded = TimeDistributed(gru)(input)
-
-dense = Dense(3, activation="softmax")(bidirectional_gru)
+bidirectional_gru = Bidirectional(GRU(units=190))(input)
+dropout = Dropout(0.3)(bidirectional_gru)
+dense = Dense(3, activation="softmax")(dropout)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
@@ -41,9 +39,9 @@ history = model.fit_generator(train_dl.generate(), epochs=8,
                               validation_data=dev_dl.generate(),
                               validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                               steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
-print(history.history.keys())
+
 with open("../results/bidirectional_hierarchical_history.json", "w") as f:
-	json.dump(history.history, f) 
+        json.dump(history.history, f)
 
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
@@ -51,10 +49,7 @@ score = model.evaluate_generator(test_dl.generate(),
 # predictions = model.predict_generator(test_dl.generate(),
 #                                      steps=int(test_dl.samples/test_dl.batch_size))
 
-print("Metrics: ", model.metrics_names)
-print("Final model score: ", score)
-
-# dict_keys(['val_categorical_accuracy', 'val_loss', 'loss', 'categorical_accuracy'])
+print("Test loss {}, test cat. accuracy: {} ".format(score[0], score[1]))
 
 print("Plotting...")
 # summarize history for accuracy
@@ -64,7 +59,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/hierarchical_bidirectional_accuracy.png")
+plt.savefig("../results/hierarchical_bidirectional_accuracy.png")
 plt.close()
 plt.clf()
 
@@ -75,6 +70,6 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/hierarchical_bidirectional_loss.png")
+plt.savefig("../results/hierarchical_bidirectional_loss.png")
 
 print("Done")

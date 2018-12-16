@@ -43,7 +43,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/fully_connected_accuracy.png")
+plt.savefig("../results/fully_connected_accuracy.png")
 plt.close()
 plt.clf()
 # summarize history for loss
@@ -53,7 +53,7 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/fully_connected_loss.png")
+plt.savefig("../results/fully_connected_loss.png")
 
 
 speeches = len(os.listdir(test_dl.data_directory))

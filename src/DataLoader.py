@@ -26,7 +26,7 @@ class DataLoader:
         self.time_distributed = time_distributed
 
         self.document_index = 0
-        self.batch_size = 32
+        self.batch_size = 64
 
         self.samples = 0
         for speech_file in os.listdir(self.data_directory):
