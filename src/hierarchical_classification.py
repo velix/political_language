@@ -7,8 +7,18 @@ train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR, True)
 
-input = Input(shape=(768,))
-encoded = GRU(units=100, return_sequences=True)(input)
+
+'''
+RNN input must take the form (batch_size, timesteps, features(hidden size/units))
+in this case, each timestep is a sentence
+
+we want an output of the form (batch_size, units), to represent a set of
+sentences (the speech) as a single vector. We need the output of
+the last node in the rnn
+'''
+
+input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
+encoded = GRU(units=100)(input)
 # bidirectional_gru = Bidirectional(GRU(units=50, return_sequences=True))
 # encoded = TimeDistributed(gru)(input)
 

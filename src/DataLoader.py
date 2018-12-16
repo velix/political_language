@@ -3,13 +3,17 @@ import os
 import numpy as np
 from bert_serving.client import BertClient
 from keras.preprocessing.text import text_to_word_sequence
-from keras.utils import Sequence
+from keras.utils import Sequence, to_categorical
 
 
 TRAINING_DATA_DIR = "../data/convote_v1.1/data_stage_one/training_set"
 DEV_DATA_DIR = "../data/convote_v1.1/data_stage_one/development_set"
 TEST_DATA_DIR = "../data/convote_v1.1/data_stage_one/test_set"
 
+MAX_DOC_LENGTH = 45
+MIN_DOC_LENGTH = 4
+
+SENT_FEATURES = 768
 
 class DataLoader(Sequence):
     def __init__(self, data_directory, time_distributed=False):
@@ -26,26 +30,54 @@ class DataLoader(Sequence):
     def __getitem__(self, idx):
         speeches = os.listdir(self.data_directory)
         speech_file = speeches[idx]
-        # ###_@@@@@@_%%%%$$$_PMV
+        label = self._get_label(speech_file)
+
+        doc_vectors = self._get_sentences_as_vectors(speech_file)
+        # check for documents with fewer sentences than MIN_DOC_LENGTH
+        if doc_vectors is None:
+            return None
+
+        one_hot_label = to_categorical(label, 3)
+        doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
+
+
+
+        if self.time_distributed:
+            rows, columns = np.shape(doc_vectors)
+            # return (np.reshape(doc_vectors, (rows, columns, 1)), doc_labels)
+            (doc_vectors, doc_labels)
+
+        return (doc_vectors, doc_labels)
+
+    def _get_label(self, speech_file):
         segments = speech_file.split("_")
         party = segments[-1][0]
 
-        label = self._party_to_label(party)
-        if label is None:
-            return None
+        return self._party_to_label(party)
 
+    def _get_sentences_as_vectors(self, speech_file):
         with open(os.path.join(self.data_directory, speech_file), "r") as f:
             speech = f.readlines()
 
         sentences = self._get_sentences(speech)
         doc_vectors = self.bc.encode(sentences)
-        doc_labels = np.ones((np.shape(doc_vectors)[0],))*label
 
-        if self.time_distributed:
-            rows, columns = np.shape(doc_vectors)
-            return (np.reshape(doc_vectors, (1, rows, columns)), doc_labels)
+        doc_vectors = self._pad_document(doc_vectors)
 
-        return (doc_vectors, doc_labels)
+        return doc_vectors
+
+
+    def _pad_document(self, doc_vectors):
+        sentences, words = np.shape(doc_vectors)
+        if sentences < MIN_DOC_LENGTH:
+            return None
+        if sentences > MAX_DOC_LENGTH:
+            return doc_vectors[:MAX_DOC_LENGTH, :]
+
+        # Padding the doc_vectors to have MAX_DOC_LENGTH
+        # number of rows. Padding with zeros
+        pad_length = MAX_DOC_LENGTH - sentences
+        return np.pad(doc_vectors, [(0, [pad_length]), (0,0)])
 
 
     def _party_to_label(self, party):
