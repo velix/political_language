@@ -36,7 +36,8 @@ utils.print_summary(model)
 utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)
 
 history = model.fit_generator(train_dl.generate(), epochs=1,
-                              validation_data=dev_dl,
+                              validation_data=dev_dl.generate(),
+                              validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                               steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
 
 score = model.evaluate_generator(test_dl.generate(),
