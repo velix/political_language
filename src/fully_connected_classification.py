@@ -1,44 +1,48 @@
 from keras.models import Model
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Dropout
 from keras import utils
 import numpy as np
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import DataLoader
 import os
+import json
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR)
 
-input = Input(shape=(768, ))
-dense1 = Dense(256, activation="relu")(input)
-dense2 = Dense(1, activation="softmax")(dense1)
+input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
+dense0 = Dense(512, activation="relu")(input)
+dropout = Dropout(0.5)(dense0)
+dense1 = Dense(256, activation="relu")(dropout)
+dropout = Dropout(0.5)(dense1)
+dense2 = Dense(1, activation="softmax")(dropout)
 
 model = Model(inputs=input, outputs=dense2)
-model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
 
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/fully_connected.png", show_shapes=True)
 
-history = model.fit_generator(train_dl, epochs=10, validation_data=dev_dl)
+history = model.fit_generator(train_dl.generate(), epochs=10,
+                              validation_data=dev_dl.generate(),
+                              validation_steps=int(dev_dl.samples/dev_dl.batch_size),
+                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
 
+with open("../results/fully_connected_history.json", "w") as f:
+    json.dump(history.history, f)
 
-# for epoch in range(1):
-#     for (X, y) in dl.generate_vectors(DataLoader.TRAINING_DATA_DIR):
-#         (X_dev, y_dev) = next(dl.generate_vectors(DataLoader.DEV_DATA_DIR))
-#         hist = model.fit(X, y, batch_size=len(X), epochs=1)
+score = model.evaluate_generator(test_dl.generate(),
+                                 steps=int(test_dl.samples/test_dl.batch_size))
 
-score = model.evaluate_generator(dev_dl)
-
-predictions = model.predict_generator(dev_dl)
 
 print("Final model score: ", score)
 
 
 # summarize history for accuracy
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
+plt.plot(history.history['categorical_accuracy'])
+plt.plot(history.history['val_categorical_accuracy'])
 plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')

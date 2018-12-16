@@ -5,6 +5,7 @@ import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+from Attention import Attention
 
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
@@ -25,11 +26,10 @@ the last node in the rnn
 '''
 
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
-bidirectional_gru = Bidirectional(GRU(units=190))(input)
-dropout = Dropout(0.5)(bidirectional_gru)
-#encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
-#attention = Attention(380)(encoder_weights)
-dense = Dense(3, activation="softmax")(dropout)
+bidirectional_gru = Bidirectional(GRU(units=190, return_sequences=True))(input)
+encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
+attention = Attention(380)(encoder_weights)
+dense = Dense(3, activation="softmax")(attention)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
@@ -61,7 +61,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../results/hierarchical_bidirectional_accuracy.png")
+plt.savefig("../results/hierarchical_bidirectional_attenton_accuracy.png")
 plt.close()
 plt.clf()
 
@@ -72,6 +72,6 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../results/hierarchical_bidirectional_loss.png")
+plt.savefig("../results/hierarchical_bidirectional_attention_loss.png")
 
 print("Done")

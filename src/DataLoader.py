@@ -17,13 +17,11 @@ SENT_FEATURES = 768
 
 
 class DataLoader:
-    def __init__(self, data_directory, time_distributed=False):
+    def __init__(self, data_directory, recurrent_samples=False):
         self.bc = BertClient()
         self.data_directory = data_directory
-        # nlp = spacy.load('en_vectors_web_lg')
-        # nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
-        self.time_distributed = time_distributed
+        self.recurrent_samples = recurrent_samples
 
         self.document_index = 0
         self.batch_size = 64
@@ -36,7 +34,10 @@ class DataLoader:
             sentences = self._get_sentences(speech)
 
             if len(sentences) > MIN_DOC_LENGTH:
-                self.samples += 1
+                if recurrent_samples:
+                    self.samples += 1
+                else:
+                    self.samples += len(sentences)
 
     def __len__(self):
         return self.samples
@@ -66,9 +67,14 @@ class DataLoader:
                 one_hot_label = to_categorical(label, 3)
                 # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
 
-                vectors.append(doc_vectors)
-                labels.append(one_hot_label)
-                sample_counter += 1
+                if self.recurrent_samples:
+                    vectors.append(doc_vectors)
+                    labels.append(one_hot_label)
+                    sample_counter += 1
+                else:
+                    vectors.extend(doc_vectors)
+                    labels.append(one_hot_label)
+                    sample_counter += np.shape(doc_vectors)[0]
 
             # if self.data_directory == TEST_DATA_DIR:
             #    print("batch")
