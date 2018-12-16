@@ -30,7 +30,7 @@ class DataLoader:
 
         self.samples = 0
         for speech_file in os.listdir(self.data_directory):
-            with open(os.path.join(self.data_directory, speech_file), "r") as f:
+            with open(os.path.join(self.data_directory, speech_file), "r", encoding="utf8") as f:
                 speech = f.readlines()
 
             sentences = self._get_sentences(speech)
@@ -79,7 +79,7 @@ class DataLoader:
         return self._party_to_label(party)
 
     def _get_sentences_as_vectors(self, speech_file):
-        with open(os.path.join(self.data_directory, speech_file), "r") as f:
+        with open(os.path.join(self.data_directory, speech_file), "r", encoding="utf8") as f:
             speech = f.readlines()
 
         sentences = self._get_sentences(speech)
