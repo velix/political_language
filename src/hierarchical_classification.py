@@ -18,11 +18,11 @@ the last node in the rnn
 '''
 
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
-encoded = GRU(units=100)(input)
-# bidirectional_gru = Bidirectional(GRU(units=50, return_sequences=True))
+# encoded = GRU(units=100)(input)
+bidirectional_gru = Bidirectional(GRU(units=50))(input)
 # encoded = TimeDistributed(gru)(input)
 
-dense = Dense(3, activation="softmax")(encoded)
+dense = Dense(3, activation="softmax")(bidirectional_gru)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])

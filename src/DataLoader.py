@@ -44,8 +44,10 @@ class DataLoader(Sequence):
 
         if self.time_distributed:
             rows, columns = np.shape(doc_vectors)
-            # return (np.reshape(doc_vectors, (rows, columns, 1)), doc_labels)
-            (doc_vectors, doc_labels)
+            vectors_reshape = np.reshape(doc_vectors, (1, rows, columns))
+            #labels_reshape = np.reshape(doc_labels, ((1,) + np.shape(doc_labels)))
+            labels_reshape = np.reshape(one_hot_label, (1,  len(one_hot_label)))
+            return (vectors_reshape, labels_reshape)
 
         return (doc_vectors, doc_labels)
 
@@ -77,7 +79,7 @@ class DataLoader(Sequence):
         # Padding the doc_vectors to have MAX_DOC_LENGTH
         # number of rows. Padding with zeros
         pad_length = MAX_DOC_LENGTH - sentences
-        return np.pad(doc_vectors, [(0, [pad_length]), (0,0)])
+        return np.pad(doc_vectors, [(0, pad_length), (0,0)], 'constant')
 
 
     def _party_to_label(self, party):
