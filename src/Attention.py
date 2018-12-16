@@ -1,5 +1,5 @@
 from keras.engine.topology import Layer
-from keras import initializations
+from keras import initializers
 from keras import backend as K
 
 
@@ -11,15 +11,14 @@ class Attention(Layer):
         2D tensor with shape: `(samples, features)`.
     '''
     def __init__(self, attention_dim, **kwargs):
-        self.init = initializations.get('glorot_uniform')
+        self.init = initializers.get('glorot_uniform')
         self.attention_dim = attention_dim
         super(Attention, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.W = self.init((self.attention_dim, self.attention_dim),
-                           name='{}_W'.format(self.name))
-        self.b = K.zeros((self.attention_dim,), name='{}_b'.format(self.name))
-        self.u = self.init((self.attention_dim,), name='{}_u'.format(self.name))
+        self.W = self.init((self.attention_dim, self.attention_dim))
+        self.b = K.zeros((self.attention_dim,))
+        self.u = self.init((self.attention_dim,))
         self.trainable_weights += [self.W, self.b, self.u]
         self.built = True
 
