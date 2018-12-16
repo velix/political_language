@@ -1,5 +1,5 @@
 import os
-# import spacy
+import json
 import numpy as np
 from bert_serving.client import BertClient
 from keras.preprocessing.text import text_to_word_sequence
@@ -70,6 +70,9 @@ class DataLoader:
                 labels.append(one_hot_label)
                 sample_counter += 1
 
+            # if self.data_directory == TEST_DATA_DIR:
+            #    print("batch")
+
             yield (np.asarray(vectors), np.asarray(labels))
 
     def _get_label(self, speech_file):
@@ -83,11 +86,13 @@ class DataLoader:
             speech = f.readlines()
 
         sentences = self._get_sentences(speech)
-        doc_vectors = self.bc.encode(sentences)
+        try:
+            doc_vectors = self.bc.encode(sentences)
+            doc_vectors = self._pad_document(doc_vectors)
+            return doc_vectors
 
-        doc_vectors = self._pad_document(doc_vectors)
-
-        return doc_vectors
+        except (UnicodeDecodeError, json.decoder.JSONDecodeError) as e:
+            return None
 
 
     def _pad_document(self, doc_vectors):
