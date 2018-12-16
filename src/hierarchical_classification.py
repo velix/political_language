@@ -1,5 +1,6 @@
 from keras.models import Model
 from keras.layers import Input, GRU, Bidirectional, Dense, Dropout, TimeDistributed
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
@@ -27,20 +28,26 @@ the last node in the rnn
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
 bidirectional_gru = Bidirectional(GRU(units=190))(input)
 dropout = Dropout(0.5)(bidirectional_gru)
-#encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
-#attention = Attention(380)(encoder_weights)
 dense = Dense(3, activation="softmax")(dropout)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
 
 utils.print_summary(model)
-utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)
+utils.plot_model(model, to_file="../models/hierarchical_bidirectional.png", show_shapes=True)
+
+callback_chkpt = ModelCheckpoint(
+                       "../models/hierarchical_bidirectional.hdf5",
+                       monitor='val_categorical_accuracy', verbose=1,
+                       save_best_only=True, mode='max')
+callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
+                                  mode="max", patience=1)
 
 history = model.fit_generator(train_dl.generate(), epochs=10,
                               validation_data=dev_dl.generate(),
                               validation_steps=int(dev_dl.samples/dev_dl.batch_size),
-                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
+                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
+                              callbacks=[callback_chkpt, callback_stopping])
 
 with open("../results/bidirectional_hierarchical_history.json", "w") as f:
         json.dump(history.history, f)
