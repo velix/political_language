@@ -3,6 +3,7 @@ from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
+import numpy as np
 
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR, True)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR, True)
@@ -31,11 +32,15 @@ model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categ
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/bidirectional_gru.png", show_shapes=True)
 
-history = model.fit_generator(train_dl, epochs=4, validation_data=dev_dl)
+history = model.fit_generator(train_dl.generate(), epochs=1,
+                              validation_data=dev_dl,
+                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
 
-score = model.evaluate_generator(test_dl)
+score = model.evaluate_generator(test_dl.generate(),
+                                 steps=int(test_dl.samples/test_dl.batch_size))
 
-predictions = model.predict_generator(test_dl)
+predictions = model.predict_generator(test_dl.generate(),
+                                      steps=int(test_dl.samples/test_dl.batch_size))
 
 print("Final model score: ", score)
 
@@ -46,7 +51,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/fully_connected_accuracy.png")
+plt.savefig("../models/hierarchical_bidirectional_accuracy.png")
 plt.close()
 plt.clf()
 # summarize history for loss
@@ -56,4 +61,4 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../models/fully_connected_loss.png")
+plt.savefig("../models/hierarchical_bidirectional_loss.png")

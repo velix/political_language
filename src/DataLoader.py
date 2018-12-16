@@ -38,7 +38,7 @@ class DataLoader(Sequence):
                 self.samples += 1
 
     def __len__(self):
-        return len(os.listdir(self.data_directory))
+        return self.samples
 
     def generate(self):
         speeches = os.listdir(self.data_directory)
@@ -49,7 +49,7 @@ class DataLoader(Sequence):
         sample_counter = 0
         while sample_counter < self.batch_size:
             speech_file = speeches[self.document_index]
-            if self.document_index >= len(speeches):
+            if self.document_index >= len(speeches)-1:
                 self.document_index = 0
             else:
                 self.document_index += 1
