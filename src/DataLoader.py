@@ -65,7 +65,7 @@ class DataLoader:
                     continue
 
                 one_hot_label = to_categorical(label, 3)
-                # doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
+
 
                 if self.recurrent_samples:
                     vectors.append(doc_vectors)
@@ -73,9 +73,13 @@ class DataLoader:
                     sample_counter += 1
                 else:
                     vectors.extend(doc_vectors)
-                    labels.append(one_hot_label)
+                    doc_labels = np.tile(one_hot_label, [np.shape(doc_vectors)[0], 1])
+                    labels.extend(doc_labels)
                     sample_counter += np.shape(doc_vectors)[0]
 
+
+            # print(np.shape(vectors))
+            # print(np.shape(labels))
             # if self.data_directory == TEST_DATA_DIR:
             #    print("batch")
 
