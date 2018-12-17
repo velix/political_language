@@ -49,7 +49,7 @@ if False:
     with open("../results/fully_connected_history.json", "w") as f:
         json.dump(history.history, f)
 
-history = json.load("../results/fully_connected_history.json")
+history = json.load(open("../results/fully_connected_history.json", "r"))
 model = load_model("../models/fully_connected.hdf5")
 
 score = model.evaluate_generator(test_dl.generate(),

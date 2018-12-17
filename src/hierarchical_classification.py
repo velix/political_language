@@ -51,9 +51,10 @@ if True:
                                       steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
                                       callbacks=[callback_chkpt, callback_stopping])
 
-with open("../results/bidirectional_hierarchical_history.json", "w") as f:
-        json.dump(history.history, f)
+        with open("../results/bidirectional_hierarchical_history.json", "w") as f:
+                json.dump(history.history, f)
 
+history = json.load(open("../results/bidirectional_hierarchical_history.json", "r"))
 model = load_model("../models/hierarchical_bidirectional.hdf5")
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
@@ -65,8 +66,8 @@ print("Test loss {}, test cat. accuracy: {} ".format(score[0], score[1]))
 
 print("Plotting...")
 # summarize history for accuracy
-plt.plot(history.history['categorical_accuracy'])
-plt.plot(history.history['val_categorical_accuracy'])
+plt.plot(history['categorical_accuracy'])
+plt.plot(history['val_categorical_accuracy'])
 plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
@@ -76,8 +77,8 @@ plt.close()
 plt.clf()
 
 # summarize history for loss
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
+plt.plot(history['loss'])
+plt.plot(history['val_loss'])
 plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
