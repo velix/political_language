@@ -35,7 +35,7 @@ callback_chkpt = ModelCheckpoint(
                        monitor='val_categorical_accuracy', verbose=1,
                        save_best_only=True, mode='max')
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
-                                  mode="max", patience=1)
+                                  mode="max", patience=2)
 
 history = model.fit_generator(train_dl.generate(), epochs=10,
                               validation_data=dev_dl.generate(),
@@ -50,7 +50,7 @@ score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
 
 
-print("Final model score: ", score)
+print("Test loss {}, test cat. accuracy: {} ".format(score[0], score[1]))
 
 
 # summarize history for accuracy
