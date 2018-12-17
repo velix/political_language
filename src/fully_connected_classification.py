@@ -1,5 +1,6 @@
 from keras.models import Model
 from keras.layers import Input, Dense, Dropout
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import utils
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -11,6 +12,10 @@ import json
 train_dl = DataLoader.DataLoader(DataLoader.TRAINING_DATA_DIR)
 dev_dl = DataLoader.DataLoader(DataLoader.DEV_DATA_DIR)
 test_dl = DataLoader.DataLoader(DataLoader.TEST_DATA_DIR)
+
+print("Train samples: ", train_dl.samples)
+print("Dev samples: ", dev_dl.samples)
+print("Test samples: ", test_dl.samples)
 
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
 dense0 = Dense(512, activation="relu")(input)
@@ -25,10 +30,18 @@ model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categ
 utils.print_summary(model)
 utils.plot_model(model, to_file="../models/fully_connected.png", show_shapes=True)
 
+callback_chkpt = ModelCheckpoint(
+                       "../models/fully_connected.hdf5",
+                       monitor='val_categorical_accuracy', verbose=1,
+                       save_best_only=True, mode='max')
+callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
+                                  mode="max", patience=1)
+
 history = model.fit_generator(train_dl.generate(), epochs=10,
                               validation_data=dev_dl.generate(),
                               validation_steps=int(dev_dl.samples/dev_dl.batch_size),
-                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size))
+                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
+                              callbacks=[callback_chkpt, callback_stopping])
 
 with open("../results/fully_connected_history.json", "w") as f:
     json.dump(history.history, f)
