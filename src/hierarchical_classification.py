@@ -44,7 +44,7 @@ callback_chkpt = ModelCheckpoint(
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=1)
 
-if True:
+if False:
         history = model.fit_generator(train_dl.generate(), epochs=10,
                                       validation_data=dev_dl.generate(),
                                       validation_steps=int(dev_dl.samples/dev_dl.batch_size),

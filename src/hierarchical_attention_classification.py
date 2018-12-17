@@ -46,23 +46,21 @@ callback_chkpt = ModelCheckpoint(
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=1)
 
-if True:
+if Fasle:
     history = model.fit_generator(train_dl.generate(), epochs=10,
                                   validation_data=dev_dl.generate(),
                                   validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                                   steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
                                   callbacks=[callback_chkpt, callback_stopping])
 
-    with open("../models/hierarchical_bidirectional_attention.png", "w") as f:
+    with open("../results/hierarchical_bidirectional_attention.json", "w") as f:
             json.dump(history.history, f)
 
-history = json.load(open("../models/hierarchical_bidirectional_attention.png", "r"))
+history = json.load(open("../results/hierarchical_bidirectional_attention.json", "r"))
 model = load_model("../models/hierarchical_bidirectional.hdf5")
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
 
-# predictions = model.predict_generator(test_dl.generate(),
-#                                      steps=int(test_dl.samples/test_dl.batch_size))
 
 print("Test loss {}, test cat. accuracy: {} ".format(score[0], score[1]))
 
