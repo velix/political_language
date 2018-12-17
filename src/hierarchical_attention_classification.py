@@ -1,5 +1,5 @@
 from keras.models import Model
-from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
+from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed, Dropout
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.models import load_model
 from keras import utils
@@ -31,7 +31,8 @@ input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
 bidirectional_gru = Bidirectional(GRU(units=190, return_sequences=True))(input)
 encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
 attention = Attention(45)(encoder_weights)
-dense = Dense(3, activation="softmax")(attention)
+drpt = Dropout(0.5)(attention)
+dense = Dense(3, activation="softmax")(drpt)
 
 model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
@@ -44,14 +45,14 @@ callback_chkpt = ModelCheckpoint(
                        monitor='val_categorical_accuracy', verbose=1,
                        save_best_only=True, mode='max')
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
-                                  mode="max", patience=1)
+                                  mode="max", patience=2)
 
-if False:
+if True:
     history = model.fit_generator(train_dl.generate(), epochs=10,
                                   validation_data=dev_dl.generate(),
                                   validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                                   steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
-                                  callbacks=[callback_chkpt, callback_stopping])
+                                  callbacks=[callback_chkpt])
 
     with open("../results/attention_hierarchical_bidirectional_history.json", "w") as f:
             json.dump(history.history, f)
@@ -71,7 +72,7 @@ plt.plot(history['val_categorical_accuracy'])
 plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'valid'], loc='upper left')
 plt.savefig("../results/attention_hierarchical_bidirectional_accuracy.png")
 plt.close()
 plt.clf()
@@ -82,7 +83,7 @@ plt.plot(history['val_loss'])
 plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'valid'], loc='upper left')
 plt.savefig("../results/attention_hierarchical_bidirectional_loss.png")
 
 print("Done")
