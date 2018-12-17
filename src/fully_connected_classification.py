@@ -39,17 +39,19 @@ callback_chkpt = ModelCheckpoint(
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=2)
 
-if True:
+if False:
     history = model.fit_generator(train_dl.generate(), epochs=10,
                                   validation_data=dev_dl.generate(),
                                   validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                                   steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
                                   callbacks=[callback_chkpt, callback_stopping])
 
-with open("../results/fully_connected_history.json", "w") as f:
-    json.dump(history.history, f)
+    with open("../results/fully_connected_history.json", "w") as f:
+        json.dump(history.history, f)
 
+history = json.load("../results/fully_connected_history.json")
 model = load_model("../models/fully_connected.hdf5")
+
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
 
@@ -58,8 +60,8 @@ print("Test loss {}, test cat. accuracy: {} ".format(score[0], score[1]))
 
 
 # summarize history for accuracy
-plt.plot(history.history['categorical_accuracy'])
-plt.plot(history.history['val_categorical_accuracy'])
+plt.plot(history['categorical_accuracy'])
+plt.plot(history['val_categorical_accuracy'])
 plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
@@ -68,8 +70,8 @@ plt.savefig("../results/fully_connected_accuracy.png")
 plt.close()
 plt.clf()
 # summarize history for loss
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
+plt.plot(history['loss'])
+plt.plot(history['val_loss'])
 plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
@@ -103,3 +105,4 @@ for speech_file in os.listdir(test_dl.data_directory):
 
 accuracy = accuracy_score(y_dev, model_pred)
 print("Test accuracy: ", accuracy)
+print("Done")
