@@ -1,6 +1,7 @@
 from keras.models import Model
 from keras.layers import Input, Dense, Dropout
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.models import load_model
 from keras import utils
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -38,15 +39,17 @@ callback_chkpt = ModelCheckpoint(
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=2)
 
-history = model.fit_generator(train_dl.generate(), epochs=10,
-                              validation_data=dev_dl.generate(),
-                              validation_steps=int(dev_dl.samples/dev_dl.batch_size),
-                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
-                              callbacks=[callback_chkpt, callback_stopping])
+if True:
+    history = model.fit_generator(train_dl.generate(), epochs=10,
+                                  validation_data=dev_dl.generate(),
+                                  validation_steps=int(dev_dl.samples/dev_dl.batch_size),
+                                  steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
+                                  callbacks=[callback_chkpt, callback_stopping])
 
 with open("../results/fully_connected_history.json", "w") as f:
     json.dump(history.history, f)
 
+model = load_model("../models/fully_connected.hdf5")
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
 

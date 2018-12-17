@@ -1,6 +1,7 @@
 from keras.models import Model
 from keras.layers import Input, GRU, Bidirectional, Dense, TimeDistributed
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.models import load_model
 from keras import utils
 import DataLoader
 import matplotlib.pyplot as plt
@@ -45,15 +46,17 @@ callback_chkpt = ModelCheckpoint(
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=1)
 
-history = model.fit_generator(train_dl.generate(), epochs=10,
-                              validation_data=dev_dl.generate(),
-                              validation_steps=int(dev_dl.samples/dev_dl.batch_size),
-                              steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
-                              callbacks=[callback_chkpt, callback_stopping])
+if True:
+    history = model.fit_generator(train_dl.generate(), epochs=10,
+                                  validation_data=dev_dl.generate(),
+                                  validation_steps=int(dev_dl.samples/dev_dl.batch_size),
+                                  steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
+                                  callbacks=[callback_chkpt, callback_stopping])
 
-with open("../results/bidirectional_hierarchical_history.json", "w") as f:
+with open("../models/hierarchical_bidirectional_attention.png", "w") as f:
         json.dump(history.history, f)
 
+model = load_model("../models/hierarchical_bidirectional.hdf5")
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
 
