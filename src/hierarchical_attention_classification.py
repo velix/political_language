@@ -37,26 +37,26 @@ model = Model(inputs=input, outputs=dense)
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["categorical_accuracy"])
 
 utils.print_summary(model)
-utils.plot_model(model, to_file="../models/hierarchical_bidirectional_attention.png", show_shapes=True)
+utils.plot_model(model, to_file="../models/attention_hierarchical_bidirectional.png", show_shapes=True)
 
 callback_chkpt = ModelCheckpoint(
-                       "../models/hierarchical_bidirectional_attention.hdf5",
+                       "../models/attention_hierarchical_bidirectional.hdf5",
                        monitor='val_categorical_accuracy', verbose=1,
                        save_best_only=True, mode='max')
 callback_stopping = EarlyStopping(monitor="val_categorical_accuracy",
                                   mode="max", patience=1)
 
-if Fasle:
+if False:
     history = model.fit_generator(train_dl.generate(), epochs=10,
                                   validation_data=dev_dl.generate(),
                                   validation_steps=int(dev_dl.samples/dev_dl.batch_size),
                                   steps_per_epoch=int(train_dl.samples/train_dl.batch_size),
                                   callbacks=[callback_chkpt, callback_stopping])
 
-    with open("../results/hierarchical_bidirectional_attention.json", "w") as f:
+    with open("../results/attention_hierarchical_bidirectional_history.json", "w") as f:
             json.dump(history.history, f)
 
-history = json.load(open("../results/hierarchical_bidirectional_attention.json", "r"))
+history = json.load(open("../results/attention_hierarchical_bidirectional_history.json", "r"))
 model = load_model("../models/hierarchical_bidirectional.hdf5")
 score = model.evaluate_generator(test_dl.generate(),
                                  steps=int(test_dl.samples/test_dl.batch_size))
@@ -72,7 +72,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../results/hierarchical_bidirectional_attenton_accuracy.png")
+plt.savefig("../results/attention_hierarchical_bidirectional_accuracy.png")
 plt.close()
 plt.clf()
 
@@ -83,6 +83,6 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['train', 'test'], loc='upper left')
-plt.savefig("../results/hierarchical_bidirectional_attention_loss.png")
+plt.savefig("../results/attention_hierarchical_bidirectional_loss.png")
 
 print("Done")
