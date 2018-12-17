@@ -10,7 +10,7 @@ TRAINING_DATA_DIR = "../data/convote_v1.1/data_stage_one/training_set"
 DEV_DATA_DIR = "../data/convote_v1.1/data_stage_one/development_set"
 TEST_DATA_DIR = "../data/convote_v1.1/data_stage_one/test_set"
 
-MAX_DOC_LENGTH = 45
+MAX_DOC_LENGTH = 20
 MIN_DOC_LENGTH = 4
 
 SENT_FEATURES = 768
