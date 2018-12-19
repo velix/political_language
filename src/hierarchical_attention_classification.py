@@ -30,7 +30,7 @@ the last node in the rnn
 input = Input(shape=(DataLoader.MAX_DOC_LENGTH, DataLoader.SENT_FEATURES))
 bidirectional_gru = Bidirectional(GRU(units=190, return_sequences=True))(input)
 encoder_weights = TimeDistributed(Dense(380))(bidirectional_gru)
-attention = Attention(45)(encoder_weights)
+attention = Attention(DataLoader.MAX_DOC_LENGTH)(encoder_weights)
 drpt = Dropout(0.5)(attention)
 dense = Dense(3, activation="softmax")(drpt)
 
