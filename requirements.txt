@@ -31,7 +31,7 @@ protobuf==3.6.1
 pydot==1.4.1
 pyparsing==2.3.0
 python-dateutil==2.7.5
-PyYAML==3.13
+PyYAML==5.4
 pyzmq==17.1.2
 regex==2018.1.10
 requests==2.21.0
