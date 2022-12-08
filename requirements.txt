@@ -2,7 +2,7 @@ absl-py==0.6.1
 astor==0.7.1
 bert-serving-client==1.5.2
 bert-serving-server==1.5.2
-certifi==2018.11.29
+certifi==2022.12.7
 chardet==3.0.4
 cycler==0.10.0
 cymem==2.0.2
